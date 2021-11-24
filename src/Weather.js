@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from "axios";
 
 function 휴게소날씨정보(props){
+
     const Get요청할URL = 'https://data.ex.co.kr/openapi/restinfo/restWeatherList?key=3195053851&type=json&sdate=20211121&stdHour=18'
     axios.get(Get요청할URL)
         .then((result)=>{
