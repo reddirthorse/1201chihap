@@ -308,6 +308,7 @@ function App() {
     <DaeMoon />
     <main>
       <br />
+      {/* 사용자 입력(출발지와 도착지 받음) */}
       <UserInput start={start}
         setStart={setStart}
         end={end}
@@ -315,29 +316,7 @@ function App() {
         setIsLoading={setIsLoading}
       />
 
-      <Weather weather={weather} />
-      <br />
-
-      {isLoading ? < Loading /> :
-        <RepFood
-          data={foodData}
-          onClick={handleClick}
-          routeCode={routeCode}
-          direction={direction}
-          start={start}
-          end={end}
-        />}
-      <br />
-      <br />
-      <Message
-        msg={message}
-        prevPage={prevPage}
-        nextPage={nextPage}
-        pageSize_h={pageSize_h}
-        pageNo_h={pageNo_h} >
-      </Message>
-      <br />
-      <br />
+      {/* 예상도착시간 */}
       <div>
         <Input name='startCity'
           type='text'
@@ -355,8 +334,36 @@ function App() {
           end={endList}>
         </GetMultiTraffic>
       </div>
+      <br/>
 
-    </main> <Footer />
+      {/* 휴게소 메뉴 */}
+      {isLoading ? < Loading /> :
+        <RepFood
+          data={foodData}
+          onClick={handleClick}
+          routeCode={routeCode}
+          direction={direction}
+          start={start}
+          end={end}
+        />}
+      <br />
+      {/* 입력받은 도착지의 날씨 */}
+      <Weather weather={weather} />
+      <br />
+
+      {/* 실시간 도로 정보 */}
+      <Message
+        msg={message}
+        prevPage={prevPage}
+        nextPage={nextPage}
+        pageSize_h={pageSize_h}
+        pageNo_h={pageNo_h} >
+      </Message>
+
+    </main>
+
+    <Footer />
+
   </div>
   );
 }
