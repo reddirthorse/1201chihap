@@ -1,0 +1,26 @@
+.main_container {
+    margin: auto;
+    border: 2px solid gainsboro;
+    border-radius: 3px;
+}
+
+.direction_message {
+    background: gray;
+    padding: 10px;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: white;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+.list_area_m {
+    margin: 3px;
+    text-align: center;
+}
+
+@media (max-width: 1190) {
+    .text_control_m {
+        font-size: 0.7em;
+    }
+}

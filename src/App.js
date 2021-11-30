@@ -1,82 +1,363 @@
 /*eslint-disable*/
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Navbar,Nav,NavDropdown,Form } from 'react-bootstrap';
-import { Button,FormControl,Container } from 'react-bootstrap';
-import { Navibar, DaeMoon ,Footer } from './frame.js';
+import { Navibar, DaeMoon, Footer } from './frame.js';
 import axios from 'axios';
-import { UserInput } from './userInput.js';
-import { 휴게소날씨정보, Weather } from './Weather.js'; import './Weather.css'; 
-import './App.css';
-import { Message, UI } from './Message.js'; //import './Message.css'
+import { UserInput } from './UserInput.js';
+import { Weather } from './Weather.js';
+import './CSS/Weather.css';
+import './CSS/App.css';
+import { Message } from './Message.js';
+import './CSS/Message.css'
+import Loading from './Loading'
+import { RepFood } from './RepFood'
+import { Input } from './Input'
+import { GetMultiTraffic } from './GetMultiTraffic'
 
 function App() {
-  let[날씨Data, 날씨Data변경] = useState([]);
+  // 공용
+  const [isLoading, setIsLoading] = useState(true)
 
+  // 한울
   const [message, setMessage] = useState([]);
+  const [pageNo_h, setPageNo_h] = useState(1);
+  const [pageSize_h, setPageSize_h] = useState(null);
 
-  let[갱신, 갱신값변경] = useState(true);
+  // 성빈
+  const [routeCode, setRouteCode] = useState('')
+  const [foodData, setFoodData] = useState([])
+  const [numOfRows_s, setNumOfRows_s] = useState(99)
+  const [direction, setDirection] = useState('')
+  const [routeName, setRouteName] = useState('')
 
-  const [pageNo, setPageNo] = useState(1);
-  const [pageSize, setPageSize] = useState(null);
+  // 상재
+  const [weather, setWeather] = useState([]);
+
+  // 11/30 추가
 
 
-  useEffect( () => {
-    const url = `http://data.ex.co.kr/openapi/burstInfo/realTimeSms?key=4047313059&type=json&numOfRows=5&pageNo=${pageNo}&pagingYn=Y`
-    axios.get(url)
-    .then( (res) => {
-        const data = res.data.realTimeSMSList;
-        const pageS = res.data.pageSize;
-        setPageSize(pageS)      // 페이지사이즈 세팅
-        
-        // 콘솔로그 테스트
-        console.log(pageS)
-        console.log(data[0].smsText)
+  let [rdApi, rdApi변경] = useState(false);
+  let [갱신, 갱신값변경] = useState(true);
+  let [갱신2, 갱신값변경2] = useState(true);
+  const [start, setStart] = useState('대구');
+  const [end, setEnd] = useState('서울');
 
-        setMessage(data);       // 데이터 세팅
-    })
-    .catch(() => {
-        console.log('서버반응 없음')
-    })
-  },[])
-  
+  const handleClick = (e) => {
+    const { name, value } = e.target
+    setRouteCode(name)
+    setDirection(value)
+    console.log(name, value)
+    console.log(routeCode, direction)
+  }
 
+  // 성우
+  const [inputs, setInputs] = useState({
+    startCity: '',
+    endCity: ''
+  })
+  const [startList, setStartList] = useState([]);
+  const [endList, setEndList] = useState([])
+
+
+  const { startCity, endCity } = inputs;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setInputs({
+      ...inputs,
+      [name]: value
+    });
+
+  }
+
+  // 인증키
+  const API_KEY = process.env.REACT_APP_API_KEY
+
+
+  // 한울 useEffect
+  useEffect(async () => {
+
+    const url = `http://data.ex.co.kr/openapi/burstInfo/realTimeSms?key=${API_KEY}&type=json&numOfRows=5&&pagingYn=Y&pageNo=`
+
+    try {
+
+      let n = pageNo_h;
+
+      const res = await axios.get(url + n.toString());
+      const data = res.data.realTimeSMSList;
+      const pageS = res.data.pageSize;
+
+      console.log(data)
+      for (var i = 0; i < 5; i++) {
+        let tmp = data[i].smsText.split("**")[1];
+        data[i].smsText = tmp;
+      }
+
+      setMessage(data);
+      setPageSize_h(pageS);
+      console.log('server: ', data);
+
+    } catch (err) {
+      console.log(err + "!!!!")
+    }
+  }, [pageNo_h])
+
+  // 한울 함수
   const nextPage = () => {
-    const nextPage = pageNo + 1
-    nextPage <= pageSize ? setPageNo(nextPage) : setPageNo(pageNo)
-    console.log(pageNo)
+    const nextPage = pageNo_h + 1
+    nextPage <= pageSize_h ? setPageNo_h(nextPage) : setPageNo_h(pageNo_h)
+    console.log(pageNo_h)
+
   }
 
   const prevPage = () => {
-    const prevPage = pageNo - 1
-    prevPage > 0 ? setPageNo(prevPage) : setPageNo(pageNo)
-    console.log(pageNo)
+    const prevPage = pageNo_h - 1
+    prevPage > 0 ? setPageNo_h(prevPage) : setPageNo_h(pageNo_h)
+    console.log(pageNo_h)
   }
 
-  return (
-    <div className="App">
-      
-      <Navibar />
-
-      <DaeMoon />
-
-      <main className="container">
-        <br/>
-        <UserInput />  
-        
-        <휴게소날씨정보 날씨Data변경 ={날씨Data변경} 갱신값변경={갱신값변경} />
-        <Weather 날씨Data={날씨Data}/>
-
-        <br/>
-        
-        <Message message={message} nextPage={nextPage} prevPage={prevPage}></Message>
 
 
-      </main>
+  // 성빈 useEffect
+  useEffect(async () => {
+    const url = `http://data.ex.co.kr/openapi/business/representFoodServiceArea?key=${API_KEY}&type=json&routeCode=${routeCode}&numOfRows=${numOfRows_s}&pageNo=`
+    const temp = []
+    try {
+      for (var i = 0; i < 3; i++) {
+        const res = await axios.get(url + (i + 1).toString())
+        const data = res.data.list
+        temp.push(...data)
+      }
 
-      <Footer />
-      
-    </div>
+      setFoodData(temp)
+      setIsLoading(false)
+
+    } catch (err) {
+      console.log('Food ERROR', err)
+    }
+  }, [routeCode])
+
+  // 성빈 useEffect 2
+  useEffect(async () => {
+    switch (start) {
+      case '서울':
+        switch (end) {
+          case '부산':
+            setDirection('부산')
+            setRouteCode('0010')
+            break;
+          case '대구':
+            setDirection('부산')
+            setRouteCode('0010')
+            break;
+          case '광주':
+            setDirection('광주')
+            setRouteCode('0010')
+            break;
+          case '대전':
+            setDirection('부산')
+            setRouteCode('0010')
+            break;
+        }
+      case '부산':
+        switch (end) {
+          case '서울':
+            setDirection('서울')
+            setRouteCode('0010')
+            break;
+          case '대구':
+            setDirection('서울')
+            setRouteCode('0010')
+            break;
+          case '광주':
+            setDirection('광주')
+            setRouteCode('0010')
+            break;
+          case '대전':
+            setDirection('부산')
+            setRouteCode('0010')
+            break;
+        }
+      case '대구':
+        switch (end) {
+          case '서울':
+            setDirection('서울')
+            setRouteCode('0010')
+            break;
+          case '부산':
+            setDirection('부산')
+            setRouteCode('0010')
+            break;
+          case '광주':
+            setDirection('광주')
+            setRouteCode('0122')
+            break;
+          case '대전':
+            setDirection('부산')
+            setRouteCode('0010')
+            break;
+        }
+      case '대전':
+        switch (end) {
+          case '서울':
+            setDirection('서울')
+            setRouteCode('0010')
+            break;
+          case '부산':
+            setDirection('부산')
+            setRouteCode('0010')
+            break;
+          case '광주':
+            setDirection('광주')
+            setRouteCode('0010')
+            break;
+          case '대전':
+            setDirection('부산')
+            setRouteCode('0010')
+            break;
+        }
+      case '광주':
+        switch (end) {
+          case '서울':
+            setDirection('서울')
+            setRouteCode('0010')
+            break;
+          case '부산':
+            setDirection('부산')
+            setRouteCode('0010')
+            break;
+          case '대구':
+            setDirection('대구')
+            setRouteCode('0122')
+            break;
+          case '대전':
+            setDirection('부산')
+            setRouteCode('0010')
+            break;
+        }
+    }
+    console.log(direction, routeCode)
+  }, [start, end])
+
+  // 상재 useEffect
+  useEffect(async () => {
+    const url = `https://data.ex.co.kr/openapi/restinfo/restWeatherList?key=${API_KEY}&type=json&sdate=20211121&stdHour=18`
+    try {
+      const res = await axios.get(url)
+      const data = res.data.list[0]
+      setWeather(data)
+    } catch {
+      console.log('Weather ERROR')
+    }
+  }, [])
+
+
+
+  // 성우 useEffect
+  useEffect(() => {
+    //경부 고속도로 하행선 시작
+    if (startCity === '서울' && endCity === '대전') {
+      setStartList(['101'])
+      setEndList(['115'])
+    } else if (startCity === '서울' && endCity === '대구') {
+      setStartList(['101'])
+      setEndList(['129'])
+    } else if (startCity === '서울' && endCity === '부산') {
+      setStartList(['101', '129', '131', '133'])
+      setEndList(['129', '131', '133', '140'])
+    } else if (startCity === '대전' && endCity === '대구') {
+      setStartList(['115'])
+      setEndList(['129'])
+    } else if (startCity === '대전' && endCity === '부산') {
+      setStartList(['115', '129', '131', '133'])
+      setEndList(['129', '131', '133', '140'])
+    } else if (startCity === '대구' && endCity === '부산') {
+      setStartList(['131', '133'])
+      setEndList(['133', '140'])
+    }
+    //경부 고속 도로 하행선 종료
+    //경부 고속도로 상행선 시작
+    else if (startCity === '부산' && endCity === '대구') {
+      setStartList(['133', '140'])
+      setEndList(['131', '133'])
+    } else if (startCity === '부산' && endCity === '대전') {
+      setStartList(['123', '131', '133', '140'])
+      setEndList(['115', '123', '131', '133'])
+    } else if (startCity === '부산' && endCity === '서울') {
+      setStartList(['123', '131', '133', '140'])
+      setEndList(['101', '123', '131', '133'])
+    } else if (startCity === '대구' && endCity === '대전') {
+      setStartList(['123'])
+      setEndList(['115'])
+    } else if (startCity === '대구' && endCity === '서울') {
+      setStartList(['123'])
+      setEndList(['101'])
+    } else if (startCity === '대전' && endCity === '서울') {
+      setStartList(['115'])
+      setEndList(['101'])
+    }
+    // --------------------- 경부 고속도로 상행선 종료 -----------------
+
+    //광주 관련 도로 시작
+
+    //광주 관련 도로 종료
+  }, [inputs])
+
+  return (<div className="App" >
+    <Navibar />
+    <DaeMoon />
+    <main>
+      <br />
+      <UserInput start={start}
+        setStart={setStart}
+        end={end}
+        setEnd={setEnd}
+        setIsLoading={setIsLoading}
+      />
+
+      <Weather weather={weather} />
+      <br />
+
+      {isLoading ? < Loading /> :
+        <RepFood
+          data={foodData}
+          onClick={handleClick}
+          routeCode={routeCode}
+          direction={direction}
+          start={start}
+          end={end}
+        />}
+      <br />
+      <br />
+      <Message
+        msg={message}
+        prevPage={prevPage}
+        nextPage={nextPage}
+        pageSize_h={pageSize_h}
+        pageNo_h={pageNo_h} >
+      </Message>
+      <br />
+      <br />
+      <div>
+        <Input name='startCity'
+          type='text'
+          placeholder=''
+          onChange={handleChange}>
+        </Input>
+        <Input name='endCity'
+          type='text'
+          placeholder=''
+          onChange={handleChange}>
+        </Input>
+        <GetMultiTraffic startCity={startCity}
+          endCity={endCity}
+          start={startList}
+          end={endList}>
+        </GetMultiTraffic>
+      </div>
+
+    </main> <Footer />
+  </div>
   );
 }
 
