@@ -1,14 +1,51 @@
 /*eslint-disable*/
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { DropdownButton, Dropdown } from 'react-bootstrap';
 import './CSS/UserInput.css';
 
 function UserInput(props) {
   let 광역시 = ['서울', '대전', '대구', '부산', '광주']
-  let 글자색 = ['warning', 'warning', 'warning', 'warning', 'warning']
+  let 글자색 = ['info', 'info', 'info', 'info', 'info']
   let [idx, setIdx] = useState(2)
   let [idxEnd, setIdxEnd] = useState(0)
+  
+  const selectStart = props.start; // 초기값 서울
+  const selectEnd = props.end;     // 초기값 부산
+
+  
+// 출발지가 선택될때마다 도착지의 드롭다운 메뉴가 갱신
+useEffect( () => {
+  dropdownMenuUpdate()
+}, [selectStart])
+
+
+// 도착지 드롭다운 메뉴 갱신 함수
+function dropdownMenuUpdate() {
+  const obj = (
+    광역시.map( (글, i) => {
+                
+      if ( selectEnd === 글 || selectStart === 글 ) {
+        console.log(selectStart, selectEnd)
+        return ;
+      } else {
+        return (
+          <Dropdown.Item key={i}
+            as="button"
+            onClick={() => {
+              props.setEnd(글);
+              setIdxEnd(i)
+            }}>
+            {글} </Dropdown.Item>
+        )
+      }
+    })
+  )
+  return obj;
+  
+}
+
+  
 
   return (
 
@@ -26,17 +63,22 @@ function UserInput(props) {
                 title="출발지 선택"
                 size="sm"
                 variant="secondary" >
-                {광역시.map(function (글, i) { // 요소수 만큼 반복
-                  return (
-                    <Dropdown.Item key={i}
-                      as="button"
-                      onClick={() => {
-                        props.setStart(글);
-                        setIdx(i)
-                      }}>
-                      {글}
-                    </Dropdown.Item>
-                  )
+                {광역시.map( (글, i) => { // 배열 수 만큼 반복하되, 출발지로 선택된 도시는 제외
+
+                  if( selectStart === 글 ) {
+                    return ;
+                  } else {
+                    return (
+                      <Dropdown.Item key={i}
+                        as="button"
+                        onClick={() => {
+                          props.setStart(글);
+                          setIdx(i)
+                        }}>
+                        {글}
+                      </Dropdown.Item>
+                    )
+                  }
                 })
                 } </DropdownButton>
               <hr />
@@ -56,18 +98,7 @@ function UserInput(props) {
                 title="도착지 선택"
                 size="sm"
                 variant="secondary" >
-                {광역시.map( (글, i) => { // 요소수 만큼 반복
-                  return (
-                    <Dropdown.Item key={i}
-                      as="button"
-                      onClick={() => {
-                        props.setEnd(글);
-                        setIdxEnd(i)
-                      }}>
-                      {글} </Dropdown.Item>
-                  )
-                })
-                }
+                  {dropdownMenuUpdate()} {/* 선택돼있는 도착지와 출발지로 선택된 도시 드롭다운메뉴에서 제거 */}
               </DropdownButton>
               <hr />
               <strong className={"d-inline-block mb-2 text-" + (글자색[idxEnd])} > <h1> <b> {props.end} </b>

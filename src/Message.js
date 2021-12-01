@@ -5,7 +5,7 @@ import { FaAngleDoubleLeft } from "react-icons/fa";
 import { FaAngleDoubleRight } from "react-icons/fa";  // Font Awesome에서 아이콘 가져오기
 
 
-const Message = ({ msg, prevPage, nextPage, pageSize_h, pageNo_h, nextTen, prevTen, sortMessage }) => {
+const Message = ({ msg, prevPage, nextPage, pageSize_h, pageNo_h, nextTen, prevTen, sortMessage, sortBy }) => {
 
   // 캐러셀 컬러 변경함수
   const imgColor = (index) => {
@@ -171,8 +171,8 @@ const Message = ({ msg, prevPage, nextPage, pageSize_h, pageNo_h, nextTen, prevT
             <Button onClick={prevPage} variant="secondary" size="sm" className="m-1">Prev</Button>&nbsp;{pageNo_h} / {pageSize_h}&nbsp;
             <Button onClick={nextPage} variant="secondary" size="sm" className="m-1">Next</Button>
             <Button onClick={nextTen} variant="secondary" size="sm" className="m-1"><FaAngleDoubleRight/></Button>
-            <Button onClick={sortMessage} variant="info" size="sm" className="m-2">최신순</Button>
           </div>
+          <Button onClick={sortMessage} variant="primary" size="sm" className="m-2">{sortBy === 'desc' ? "과거순" : "최신순"}</Button>
         </div>
       </div>
     </div>

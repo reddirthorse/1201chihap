@@ -25,8 +25,7 @@ const Weather = (props) => {
         return (
           (data.routeName === routeName)
           && (data.updownTypeCode === updownCode)
-          && (data.yValue <= srtYvalue)
-          && (data.yValue >= endYvalue)
+          && (updownCode === 'S' ? (data.yValue <= srtYvalue)&&(data.yValue >= endYvalue):(data.yValue <= endYvalue)&&(data.yValue >= srtYvalue) )
         )
       })
       .map((data, i) => {
