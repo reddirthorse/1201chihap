@@ -1,7 +1,11 @@
 import { Carousel, Button, Badge, Table } from "react-bootstrap";
 import './CSS/Message.css'
 
-const Message = ({ msg, prevPage, nextPage, pageSize_h, pageNo_h }) => {
+import { FaAngleDoubleLeft } from "react-icons/fa";
+import { FaAngleDoubleRight } from "react-icons/fa";  // Font Awesome에서 아이콘 가져오기
+
+
+const Message = ({ msg, prevPage, nextPage, pageSize_h, pageNo_h, nextTen, prevTen, sortMessage }) => {
 
   // 캐러셀 컬러 변경함수
   const imgColor = (index) => {
@@ -22,6 +26,7 @@ const Message = ({ msg, prevPage, nextPage, pageSize_h, pageNo_h }) => {
         )
         break;
 
+      case "강우":
       case "작업":
       case "강풍":
       case "장애물":
@@ -74,7 +79,7 @@ const Message = ({ msg, prevPage, nextPage, pageSize_h, pageNo_h }) => {
         {imgColor(index)}
         <Carousel.Caption>
           <p className="mb-auto" style={carousel_sort}>{m.accType}</p>
-          <div className="mb-1" style={{ fontSize: '1.15em', color: 'black' }}>{m.smsText}</div>
+          <div className="mb-1" style={{ fontSize: '1.15em', color: 'black' }}>{m.smsText !== undefined ? m.smsText : `${m.roadNM} ${m.startEndTypeCode} ${m.accType}`}</div>
 
           <p className="mb-auto" style={{ fontWeight: 'bold', color: 'gray' }}><span>{m.accDate}</span> {loadHour(index)}</p>
 
@@ -102,16 +107,18 @@ const Message = ({ msg, prevPage, nextPage, pageSize_h, pageNo_h }) => {
         )
         break;
 
+      case "강우":
       case "작업":
       case "강풍":
+      case "장애물":
         badge = (
-          <Badge bg="danger" style={badgeStyle}>Danger</Badge>
+          <Badge bg="warning" text="dark" style={badgeStyle}>Warning</Badge>
         )
         break;
 
       default:
         badge = (
-          <Badge bg="warning" text="dark" style={badgeStyle}>Warning</Badge>
+          <Badge bg="danger" style={badgeStyle}>Issue</Badge>
         )
     }
     return badge;
@@ -131,7 +138,7 @@ const Message = ({ msg, prevPage, nextPage, pageSize_h, pageNo_h }) => {
           {badgeUI(msg.accType)}
         </td>
         <td>
-          {msg.smsText !== undefined ? msg.smsText : `${msg.roadNM} ${msg.startEndTypeCode} 정체`}
+          {msg.smsText !== undefined ? msg.smsText : `${msg.roadNM} ${msg.startEndTypeCode} ${msg.accType}`}
         </td>
       </tr>
       // </div>
@@ -160,8 +167,11 @@ const Message = ({ msg, prevPage, nextPage, pageSize_h, pageNo_h }) => {
             </Table>
           </div>
           <div>
-            <Button onClick={prevPage} variant="secondary" size="sm" className="m-2">Prev</Button>{pageNo_h} / {pageSize_h}
-            <Button onClick={nextPage} variant="secondary" size="sm" className="m-2">Next</Button>
+            <Button onClick={prevTen} variant="secondary" size="sm" className="m-1"><FaAngleDoubleLeft/></Button>
+            <Button onClick={prevPage} variant="secondary" size="sm" className="m-1">Prev</Button>&nbsp;{pageNo_h} / {pageSize_h}&nbsp;
+            <Button onClick={nextPage} variant="secondary" size="sm" className="m-1">Next</Button>
+            <Button onClick={nextTen} variant="secondary" size="sm" className="m-1"><FaAngleDoubleRight/></Button>
+            <Button onClick={sortMessage} variant="info" size="sm" className="m-2">최신순</Button>
           </div>
         </div>
       </div>

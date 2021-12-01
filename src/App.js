@@ -19,9 +19,10 @@ function App() {
   const [isLoading, setIsLoading] = useState(true)
 
   // 한울
-  const [message, setMessage] = useState([]);
-  const [pageNo_h, setPageNo_h] = useState(1);
-  const [pageSize_h, setPageSize_h] = useState(null);
+  const [message, setMessage] = useState([]);             // 메세지 배열 realTimeSMSList
+  const [pageSize_h, setPageSize_h] = useState(null);     // 1페이지당 5개항목 기준으로 총 페이지수
+  const [pageNo_h, setPageNo_h] = useState(1);            // 현재 페이지 번호
+  const [sortBy, setSortBy] = useState('desc');           // 날짜별 최신순,오래된순 변경
 
   // 성빈
   const [routeCode, setRouteCode] = useState('')
@@ -77,7 +78,7 @@ function App() {
   // 한울 useEffect
   useEffect(async () => {
 
-    const url = `http://data.ex.co.kr/openapi/burstInfo/realTimeSms?key=${API_KEY}&type=json&numOfRows=5&&pagingYn=Y&pageNo=`
+    const url = `http://data.ex.co.kr/openapi/burstInfo/realTimeSms?key=${API_KEY}&type=json&sortType=${sortBy}&numOfRows=5&&pagingYn=Y&pageNo=`
 
     try {
 
@@ -87,7 +88,7 @@ function App() {
       const data = res.data.realTimeSMSList;
       const pageS = res.data.pageSize;
 
-      console.log(data)
+      // 홍보/이벤트 smsText 에 붙어있는 ** 제거
       for (var i = 0; i < 5; i++) {
         let tmp = data[i].smsText.split("**")[1];
         data[i].smsText = tmp;
@@ -95,25 +96,42 @@ function App() {
 
       setMessage(data);
       setPageSize_h(pageS);
-      console.log('server: ', data);
 
     } catch (err) {
       console.log(err + "!!!!")
     }
-  }, [pageNo_h])
+  }, [pageNo_h, sortBy])   // 이부분 수정필요
 
   // 한울 함수
-  const nextPage = () => {
+  const nextPage = () => {   // 다음으로 한칸이동
     const nextPage = pageNo_h + 1
     nextPage <= pageSize_h ? setPageNo_h(nextPage) : setPageNo_h(pageNo_h)
     console.log(pageNo_h)
 
   }
 
-  const prevPage = () => {
+  const prevPage = () => {   // 이전으로 한칸이동
     const prevPage = pageNo_h - 1
     prevPage > 0 ? setPageNo_h(prevPage) : setPageNo_h(pageNo_h)
     console.log(pageNo_h)
+  }
+
+  const nextTen = () => {    // 다음으로 10칸이동
+    const nextPage = pageNo_h + 10
+    nextPage <= pageSize_h ? setPageNo_h(nextPage) : setPageNo_h(pageSize_h)
+    console.log(pageNo_h)
+  }
+
+  const prevTen = () => {    // 이전으로 10칸이동
+    const prevPage = pageNo_h - 10
+    prevPage > 0 ? setPageNo_h(prevPage) : setPageNo_h(1)
+    console.log(pageNo_h)
+  }
+
+  const sortMessage = () => {
+    const ascORdesc = sortBy
+    ascORdesc !== 'desc' ? setSortBy('desc') : setSortBy('asc')
+    console.log(sortBy)
   }
 
 
@@ -236,7 +254,7 @@ function App() {
             break;
         }
     }
-    console.log(direction, routeCode)
+    // console.log(direction, routeCode)
   }, [start, end])
 
   // 상재 useEffect
@@ -308,6 +326,7 @@ function App() {
     <DaeMoon />
     <main>
       <br />
+      {/* 사용자 입력(출발지와 도착지 받음) */}
       <UserInput start={start}
         setStart={setStart}
         end={end}
@@ -315,29 +334,7 @@ function App() {
         setIsLoading={setIsLoading}
       />
 
-      <Weather weather={weather} />
-      <br />
-
-      {isLoading ? < Loading /> :
-        <RepFood
-          data={foodData}
-          onClick={handleClick}
-          routeCode={routeCode}
-          direction={direction}
-          start={start}
-          end={end}
-        />}
-      <br />
-      <br />
-      <Message
-        msg={message}
-        prevPage={prevPage}
-        nextPage={nextPage}
-        pageSize_h={pageSize_h}
-        pageNo_h={pageNo_h} >
-      </Message>
-      <br />
-      <br />
+      {/* 예상도착시간 */}
       <div>
         <Input name='startCity'
           type='text'
@@ -355,8 +352,39 @@ function App() {
           end={endList}>
         </GetMultiTraffic>
       </div>
+      <br/>
 
-    </main> <Footer />
+      {/* 휴게소 메뉴 */}
+      {isLoading ? < Loading /> :
+        <RepFood
+          data={foodData}
+          onClick={handleClick}
+          routeCode={routeCode}
+          direction={direction}
+          start={start}
+          end={end}
+        />}
+      <br />
+      {/* 입력받은 도착지의 날씨 */}
+      <Weather weather={weather} />
+      <br />
+
+      {/* 실시간 도로 정보 */}
+      <Message
+        msg={message}
+        pageSize_h={pageSize_h}
+        pageNo_h={pageNo_h}
+        nextPage={nextPage}
+        prevPage={prevPage}
+        nextTen={nextTen}
+        prevTen={prevTen}
+        sortMessage={sortMessage}
+        ></Message>
+
+    </main>
+
+    <Footer />
+
   </div>
   );
 }

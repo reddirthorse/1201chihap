@@ -49,8 +49,6 @@ const GetMultiTraffic = (props) => {
       // const res = await axios.all(url);
       // console.log(res);
       setDataSumList([sumTimeAvg, sumTimeMax, sumTimeMin])
-      console.log(dataSumList)
-      console.log(sumTimeMin)
     }
 
     // getTraffics()
@@ -59,7 +57,6 @@ const GetMultiTraffic = (props) => {
     }
   }, [props])
 
-  console.log(dataSumList)
   return (
 
     <div className="col-md-12">
