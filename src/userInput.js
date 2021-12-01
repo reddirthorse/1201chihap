@@ -56,7 +56,7 @@ function UserInput(props) {
                 title="도착지 선택"
                 size="sm"
                 variant="secondary" >
-                {광역시.map(function (글, i) { // 요소수 만큼 반복
+                {광역시.map( (글, i) => { // 요소수 만큼 반복
                   return (
                     <Dropdown.Item key={i}
                       as="button"

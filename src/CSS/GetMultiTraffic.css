@@ -1,0 +1,16 @@
+.traffic-container {
+  margin: auto;
+  border: 2px solid gainsboro;
+  border-radius: 3px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.traffic-innerContainer {
+  background: black;
+}
+
+.Traffic-area {
+  color: gray;
+
+}

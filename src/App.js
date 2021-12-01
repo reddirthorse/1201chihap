@@ -15,8 +15,7 @@ import { Input } from './Input'
 import { GetMultiTraffic } from './GetMultiTraffic'
 
 function App() {
-  // 공용
-  const [isLoading, setIsLoading] = useState(true)
+  
 
   // 한울
   const [message, setMessage] = useState([]);             // 메세지 배열 realTimeSMSList
@@ -25,14 +24,20 @@ function App() {
   const [sortBy, setSortBy] = useState('desc');           // 날짜별 최신순,오래된순 변경
 
   // 성빈
+  const [foodLoading, setFoodLoading] = useState(true)
   const [routeCode, setRouteCode] = useState('')
   const [foodData, setFoodData] = useState([])
   const [numOfRows_s, setNumOfRows_s] = useState(99)
   const [direction, setDirection] = useState('')
   const [routeName, setRouteName] = useState('')
+  const [srtYvalue, setSrtYvalue] = useState(0)
+  const [endYvalue, setEndYvalue] = useState(0)
+  const [updownCode, setUpDownCode] = useState('')
 
   // 상재
   const [weather, setWeather] = useState([]);
+  const [srtCityNum, setSrtCityNum] = useState('0')
+  const [endCityNum, setEndCityNum] = useState('3')
 
   // 11/30 추가
 
@@ -40,8 +45,8 @@ function App() {
   let [rdApi, rdApi변경] = useState(false);
   let [갱신, 갱신값변경] = useState(true);
   let [갱신2, 갱신값변경2] = useState(true);
-  const [start, setStart] = useState('대구');
-  const [end, setEnd] = useState('서울');
+  const [start, setStart] = useState('서울');
+  const [end, setEnd] = useState('부산');
 
   const handleClick = (e) => {
     const { name, value } = e.target
@@ -52,25 +57,16 @@ function App() {
   }
 
   // 성우
-  const [inputs, setInputs] = useState({
-    startCity: '',
-    endCity: ''
+  const [startList,setStartList] = useState({
+    code:[],
+    name:[]
+  });
+  const [endList,setEndList] = useState({
+    code:[],
+    name:[]
   })
-  const [startList, setStartList] = useState([]);
-  const [endList, setEndList] = useState([])
 
-
-  const { startCity, endCity } = inputs;
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setInputs({
-      ...inputs,
-      [name]: value
-    });
-
-  }
-
+  
   // 인증키
   const API_KEY = process.env.REACT_APP_API_KEY
 
@@ -139,7 +135,7 @@ function App() {
   // 성빈 useEffect
   useEffect(async () => {
     const url = `http://data.ex.co.kr/openapi/business/representFoodServiceArea?key=${API_KEY}&type=json&routeCode=${routeCode}&numOfRows=${numOfRows_s}&pageNo=`
-    const temp = []
+    const temp = [] // API를 여러번 불러와서 데이터를 저장하기 위한 빈 배열
     try {
       for (var i = 0; i < 3; i++) {
         const res = await axios.get(url + (i + 1).toString())
@@ -148,113 +144,174 @@ function App() {
       }
 
       setFoodData(temp)
-      setIsLoading(false)
+      setFoodLoading(false)
 
     } catch (err) {
       console.log('Food ERROR', err)
     }
-  }, [routeCode])
+  }, [routeCode]) // 도로 코드가 바뀔때 마다 새로 불러옴
 
   // 성빈 useEffect 2
   useEffect(async () => {
     switch (start) {
       case '서울':
+        setSrtCityNum('0')
+        setSrtYvalue(37.54)
         switch (end) {
-          case '부산':
-            setDirection('부산')
-            setRouteCode('0010')
-            break;
-          case '대구':
-            setDirection('부산')
-            setRouteCode('0010')
-            break;
           case '광주':
-            setDirection('광주')
-            setRouteCode('0010')
+            setDirection('목포')
+            setRouteCode('0150')
+            setRouteName('서해안선')
+            setEndYvalue(35.11)
             break;
           case '대전':
             setDirection('부산')
             setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(36.32)
+            break;
+          case '대구':
+            setDirection('부산')
+            setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(35.90)
+            break;
+          case '부산':
+            setDirection('부산')
+            setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(35.30)
+            // setUpDownCode('S') // 하행
             break;
         }
+        break;
       case '부산':
+        setSrtCityNum('3')
+        setSrtYvalue(35.30)
         switch (end) {
-          case '서울':
-            setDirection('서울')
-            setRouteCode('0010')
+          case '광주':
+            setDirection('순천')
+            setRouteCode('0100')
+            setRouteName('남해선')
+            setEndYvalue(35.11)
             break;
           case '대구':
+            setDirection('부산')
+            setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(35.30)
+            break;
+          case '서울':
             setDirection('서울')
             setRouteCode('0010')
-            break;
-          case '광주':
-            setDirection('광주')
-            setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(37.54)
             break;
           case '대전':
             setDirection('부산')
             setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(36.32)
             break;
         }
+        break;
       case '대구':
+        setSrtCityNum('2')
+        setSrtYvalue(35.90)
         switch (end) {
-          case '서울':
-            setDirection('서울')
-            setRouteCode('0010')
-            break;
-          case '부산':
-            setDirection('부산')
-            setRouteCode('0010')
-            break;
           case '광주':
-            setDirection('광주')
+            setDirection('무안')
             setRouteCode('0122')
-            break;
-          case '대전':
-            setDirection('부산')
-            setRouteCode('0010')
-            break;
-        }
-      case '대전':
-        switch (end) {
-          case '서울':
-            setDirection('서울')
-            setRouteCode('0010')
+            setRouteName('광주대구선')
+            setEndYvalue(35.11)
             break;
           case '부산':
             setDirection('부산')
             setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(35.30)
+            break;
+          case '서울':
+            setDirection('서울')
+            setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(37.54)
+            break;
+          case '대전':
+            setDirection('부산')
+            setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(36.32)
+            break;
+        }
+        break;
+      case '대전':
+        setSrtCityNum('1')
+        setSrtYvalue(36.32)
+        switch (end) {
+          case '서울':
+            setDirection('서울')
+            setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(37.54)
             break;
           case '광주':
-            setDirection('광주')
-            setRouteCode('0010')
+            setDirection('순천')
+            setRouteCode('0251')
+            setRouteName('호남선')
+            setEndYvalue(35.11)
             break;
-          case '대전':
+          case '대구':
             setDirection('부산')
             setRouteCode('0010')
-            break;
-        }
-      case '광주':
-        switch (end) {
-          case '서울':
-            setDirection('서울')
-            setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(35.30)
             break;
           case '부산':
             setDirection('부산')
             setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(35.30)
+            break;
+        }
+        break;
+      case '광주':
+        setSrtCityNum('4')
+        setSrtYvalue(35.11)
+        switch (end) {
+          case '서울':
+            setDirection('서울')
+            setRouteCode('0010')
+            setRouteName('경부선')
+            setEndYvalue(37.54)
+            break;
+          case '부산':
+            setDirection('부산')
+            setRouteCode('0010')
+            setRouteName('남해선(순천-부산)')
+            setEndYvalue(35.30)
             break;
           case '대구':
             setDirection('대구')
             setRouteCode('0122')
+            setRouteName('광주대구선')
+            setEndYvalue(35.30)
             break;
           case '대전':
-            setDirection('부산')
-            setRouteCode('0010')
+            setDirection('논산')
+            setRouteCode('0251')
+            setRouteName('호남선')
+            setEndYvalue(36.32)
             break;
         }
+        break;
     }
-    // console.log(direction, routeCode)
+    if(srtYvalue-endYvalue>0){
+      setUpDownCode('S') // 하행
+    }else{
+      setUpDownCode('E') // 상행
+    }
+    console.log(direction, routeCode)
   }, [start, end])
 
   // 상재 useEffect
@@ -262,64 +319,77 @@ function App() {
     const url = `https://data.ex.co.kr/openapi/restinfo/restWeatherList?key=${API_KEY}&type=json&sdate=20211121&stdHour=18`
     try {
       const res = await axios.get(url)
-      const data = res.data.list[0]
+      const data = res.data.list
       setWeather(data)
     } catch {
       console.log('Weather ERROR')
     }
-  }, [])
+  },[start, end])
 
 
 
   // 성우 useEffect
-  useEffect(() => {
+  useEffect(() =>{
     //경부 고속도로 하행선 시작
-    if (startCity === '서울' && endCity === '대전') {
-      setStartList(['101'])
-      setEndList(['115'])
-    } else if (startCity === '서울' && endCity === '대구') {
-      setStartList(['101'])
-      setEndList(['129'])
-    } else if (startCity === '서울' && endCity === '부산') {
-      setStartList(['101', '129', '131', '133'])
-      setEndList(['129', '131', '133', '140'])
-    } else if (startCity === '대전' && endCity === '대구') {
-      setStartList(['115'])
-      setEndList(['129'])
-    } else if (startCity === '대전' && endCity === '부산') {
-      setStartList(['115', '129', '131', '133'])
-      setEndList(['129', '131', '133', '140'])
-    } else if (startCity === '대구' && endCity === '부산') {
-      setStartList(['131', '133'])
-      setEndList(['133', '140'])
+    if (start ==='서울' && end ==='대전'){
+      setStartList({code:['101'],name:['서울']})
+      setEndList({code:['115'],name:['대전']})
+    }
+    else if(start ==='서울' && end ==='대구'){
+      setStartList({code:['101'],name:['서울']})
+      setEndList({code:['129'],name:['북대구']})
+    }
+    else if(start ==='서울' && end ==='부산'){
+      setStartList({code:['101','129','131','133'],name:['서울','북대구','경산','건천']})
+      setEndList({code:['129','131','133','140'],name:['북대구','경산','건천','부산']})
+
+    }else if(start ==='대전' && end ==='대구'){
+      setStartList({code:['115'],name:['대전']})
+      setEndList({code:['129'],name:['북대구']})
+    }
+    else if(start ==='대전' && end ==='부산'){
+      setStartList({code:['115','129','131','133'],name:['대전','북대구','경산','건천']})
+      setEndList({code:['129','131','133','140'],name:['북대구','경산','건천','부산']})
+    }
+    else if(start ==='대구' && end ==='부산'){
+      setStartList({code:['131','133'],name:['경산','건천']})
+      setEndList({code:['133','140'],name:['건천','부산']})
     }
     //경부 고속 도로 하행선 종료
     //경부 고속도로 상행선 시작
-    else if (startCity === '부산' && endCity === '대구') {
-      setStartList(['133', '140'])
-      setEndList(['131', '133'])
-    } else if (startCity === '부산' && endCity === '대전') {
-      setStartList(['123', '131', '133', '140'])
-      setEndList(['115', '123', '131', '133'])
-    } else if (startCity === '부산' && endCity === '서울') {
-      setStartList(['123', '131', '133', '140'])
-      setEndList(['101', '123', '131', '133'])
-    } else if (startCity === '대구' && endCity === '대전') {
-      setStartList(['123'])
-      setEndList(['115'])
-    } else if (startCity === '대구' && endCity === '서울') {
-      setStartList(['123'])
-      setEndList(['101'])
-    } else if (startCity === '대전' && endCity === '서울') {
-      setStartList(['115'])
-      setEndList(['101'])
+    else if (start ==='부산' && end ==='대구'){
+      setStartList({code:['140','133'],name:['부산','건천']})
+      setEndList({code:['133','131'],name:['건천','경산']})
     }
-    // --------------------- 경부 고속도로 상행선 종료 -----------------
-
+    else if (start ==='부산' && end ==='대전'){
+      setStartList({code:['140','133','131','129'],name:['부산','건천','경산','북대구']})
+      setEndList({code:['133','131','129','115'],name:['건천','경산','북대구','대전']})
+    }
+    else if (start ==='부산' && end ==='서울'){
+      setStartList({code:['140','133','131','129'],name:['부산','건천','경산','북대구']})
+      setEndList({code:['133','131','129','101'],name:['건천','경산','북대구','서울']})
+    }
+    else if (start ==='대구' && end ==='대전'){
+      setStartList({code:['129'],name:['북대구']})
+      setEndList({code:['115'],name:['대전']})
+    }
+    else if (start ==='대구' && end ==='서울'){
+      setStartList({code:['129'],name:['대구']})
+      setEndList({code:['101'],name:['서울']})
+    }
+    else if (start ==='대전' && end ==='서울'){
+      setStartList({code:['115'],name:['대전']})
+      setEndList({code:['101'],name:['서울']})
+    }
+    //경부 고속도로 상행선 종료
     //광주 관련 도로 시작
 
     //광주 관련 도로 종료
-  }, [inputs])
+ 
+    
+  },[start,end])
+
+
 
   return (<div className="App" >
     <Navibar />
@@ -331,31 +401,19 @@ function App() {
         setStart={setStart}
         end={end}
         setEnd={setEnd}
-        setIsLoading={setIsLoading}
+        setFoodLoading={setFoodLoading}
       />
 
       {/* 예상도착시간 */}
-      <div>
-        <Input name='startCity'
-          type='text'
-          placeholder=''
-          onChange={handleChange}>
-        </Input>
-        <Input name='endCity'
-          type='text'
-          placeholder=''
-          onChange={handleChange}>
-        </Input>
-        <GetMultiTraffic startCity={startCity}
-          endCity={endCity}
-          start={startList}
-          end={endList}>
-        </GetMultiTraffic>
-      </div>
-      <br/>
+    <div>
+      {/* <Input name = 'start' type = 'text' placeholder ='' onChange = {handleChange}></Input>
+      <Input name = 'end' type = 'text' placeholder ='' onChange = {handleChange}></Input> */}
+      <GetMultiTraffic start={start} end={end} startList={startList} endList={endList}></GetMultiTraffic>
+    </div>
+      <br />
 
       {/* 휴게소 메뉴 */}
-      {isLoading ? < Loading /> :
+      {foodLoading ? < Loading /> :
         <RepFood
           data={foodData}
           onClick={handleClick}
@@ -366,7 +424,15 @@ function App() {
         />}
       <br />
       {/* 입력받은 도착지의 날씨 */}
-      <Weather weather={weather} />
+      <Weather 
+        weather={weather} 
+        start={start}
+        end={end}
+        routeName={routeName}
+        srtYvalue={srtYvalue}
+        endYvalue={endYvalue}
+        updownCode={updownCode}
+        />
       <br />
 
       {/* 실시간 도로 정보 */}
@@ -379,7 +445,7 @@ function App() {
         nextTen={nextTen}
         prevTen={prevTen}
         sortMessage={sortMessage}
-        ></Message>
+      ></Message>
 
     </main>
 
