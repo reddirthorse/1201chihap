@@ -402,7 +402,7 @@ function App() {
       setEndList({code:['251'],name:['동광주']})
     }
     else if (start ==='부산' && end ==='광주'){
-      setStartList({code:[' 244'],name:['서부산'],route:'2시간 29분'})
+      setStartList({code:['244'],name:['서부산'],route:'2시간 29분'})
       setEndList({code:['251'],name:['동광주']})
     }
     //상행선 종료
