@@ -60,7 +60,8 @@ function App() {
   // 성우
   const [startList,setStartList] = useState({
     code:[],
-    name:[]
+    name:[],
+    route:''
   });
   const [endList,setEndList] = useState({
     code:[],
@@ -336,78 +337,96 @@ function App() {
   useEffect(() =>{
     //경부 고속도로 하행선 시작
     if (start ==='서울' && end ==='대전'){
-      setStartList({code:['101'],name:['서울']})
+      setStartList({code:['101'],name:['서울'],route:'1시간 39분'})
       setEndList({code:['115'],name:['대전']})
     }
     else if(start ==='서울' && end ==='대구'){
-      setStartList({code:['101'],name:['서울']})
+      setStartList({code:['101'],name:['서울'],route:'3시간 15분'})
       setEndList({code:['129'],name:['북대구']})
     }
     else if(start ==='서울' && end ==='부산'){
-      setStartList({code:['101','129','131','133'],name:['서울','북대구','경산','건천']})
+      setStartList({code:['101','129','131','133'],name:['서울','북대구','경산','건천'],route:'4시간 36분'})
       setEndList({code:['129','131','133','140'],name:['북대구','경산','건천','부산']})
 
     }else if(start ==='대전' && end ==='대구'){
-      setStartList({code:['115'],name:['대전']})
+      setStartList({code:['115'],name:['대전'],route:'1시간 57분'})
       setEndList({code:['129'],name:['북대구']})
     }
     else if(start ==='대전' && end ==='부산'){
-      setStartList({code:['115','129','131','133'],name:['대전','북대구','경산','건천']})
+      setStartList({code:['115','129','131','133'],name:['대전','북대구','경산','건천'],route:'3시간 37분'})
       setEndList({code:['129','131','133','140'],name:['북대구','경산','건천','부산']})
     }
     else if(start ==='대구' && end ==='부산'){
-      setStartList({code:['131','133'],name:['경산','건천']})
+      setStartList({code:['131','133'],name:['경산','건천'],route:'1시간 16분'})
       setEndList({code:['133','140'],name:['건천','부산']})
     }
     //경부 고속 도로 하행선 종료
     //경부 고속도로 상행선 시작
     else if (start ==='부산' && end ==='대구'){
-      setStartList({code:['140','133'],name:['부산','건천']})
+      setStartList({code:['140','133'],name:['부산','건천'],route:'1시간 15분'})
       setEndList({code:['133','131'],name:['건천','경산']})
     }
     else if (start ==='부산' && end ==='대전'){
-      setStartList({code:['140','133','131','129'],name:['부산','건천','경산','북대구']})
+      setStartList({code:['140','133','131','129'],name:['부산','건천','경산','북대구'],route:'2시간 40분'})
       setEndList({code:['133','131','129','115'],name:['건천','경산','북대구','대전']})
     }
     else if (start ==='부산' && end ==='서울'){
-      setStartList({code:['140','133','131','129'],name:['부산','건천','경산','북대구']})
+      setStartList({code:['140','133','131','129'],name:['부산','건천','경산','북대구'],route:'4시간 38분'})
       setEndList({code:['133','131','129','101'],name:['건천','경산','북대구','서울']})
     }
     else if (start ==='대구' && end ==='대전'){
-      setStartList({code:['129'],name:['북대구']})
+      setStartList({code:['129'],name:['북대구'],route:'1시간 34분'})
       setEndList({code:['115'],name:['대전']})
     }
     else if (start ==='대구' && end ==='서울'){
-      setStartList({code:['129'],name:['대구']})
+      setStartList({code:['129'],name:['대구'],route:'3시간 21분'})
       setEndList({code:['101'],name:['서울']})
     }
     else if (start ==='대전' && end ==='서울'){
-      setStartList({code:['115'],name:['대전']})
+      setStartList({code:['115'],name:['대전'],route:'1시간 44분'})
       setEndList({code:['101'],name:['서울']})
     }
     //경부 고속도로 상행선 종료
     //광주 관련 도로 시작
     //상행선 시작
     else if (start ==='서울' && end ==='광주'){
-      setStartList({code:['101','612','608'],name:['서울','풍세하','남논산']})
+      setStartList({code:['101','612','608'],name:['서울','풍세하','남논산'],route:'2시간 58분'})
       setEndList({code:['108','608','167'],name:['천안','남논산','광주']})
     }
     else if (start ==='대전' && end ==='광주'){
-      setStartList({code:['152','608'],name:['대전','남논산']})
+      setStartList({code:['152','608'],name:['대전','남논산'],route:'1시간 53분'})
       setEndList({code:['155','167'],name:['논산','광주']})
+    }
+    else if (start ==='대구' && end ==='광주'){
+      setStartList({code:['519'],name:['남대구'],route:'1시간 46분'})
+      setEndList({code:['251'],name:['동광주']})
+    }
+    else if (start ==='부산' && end ==='광주'){
+      setStartList({code:[' 244'],name:['서부산'],route:'2시간 29분'})
+      setEndList({code:['251'],name:['동광주']})
     }
     //상행선 종료
     
     //하행선 시작
     else if (start ==='광주' && end ==='서울'){
-      setStartList({code:['101','612','608'],name:['서울','풍세하','남논산']})
+      setStartList({code:['101','612','608'],name:['서울','풍세하','남논산'],route:'3시간 51분'})
       setEndList({code:['108','608','167'],name:['천안','남논산','광주']})
-      //광주서 서울로 가는 건 데이터가 없음 걍 똑같이 두겠음
+      
     }
     else if (start ==='광주' && end ==='대전'){
-      setStartList({code:['152','608'],name:['대전','남논산']})
+      setStartList({code:['152','608'],name:['대전','남논산'],route:'2시간 20분'})
       setEndList({code:['155','167'],name:['논산','광주']})
-      //광주서 대전로 가는 건 데이터가 없음 걍 똑같이 두겠음
+      
+    }
+    else if (start ==='광주' && end ==='대구'){
+      setStartList({code:['251'],name:['동광주'],route:'1시간 46분'})
+      setEndList({code:['519'],name:['남대구']})
+      
+    }
+    else if (start ==='광주' && end ==='부산'){
+      setStartList({code:['251'],name:['동광주'],route:'2시간 40분'})
+      setEndList({code:['244'],name:['서부산']})
+      
     }
 
     //하생선 종료
@@ -432,7 +451,7 @@ function App() {
       }   
   }
   for (let i = 0; i <startList.code.length;i++){
-    tempCityList.push({'sCity':startList.name[i],'eCity':endList.name[i]})
+    tempCityList.push({'sCity':startList.name[i],'eCity':endList.name[i],'route':startList.route})
   }
   for (let j = 0; j < tempDataList.length; j++) {
       sumTimeAvg = sumTimeAvg + parseInt(tempDataList[j].timeAvg)
