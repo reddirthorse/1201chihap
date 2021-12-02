@@ -11,7 +11,7 @@ import { Message } from './Message.js';
 import './CSS/Message.css'
 import Loading from './Loading'
 import { RepFood } from './RepFood'
-import { Input } from './Input'
+
 import { GetMultiTraffic } from './GetMultiTraffic'
 
 function App() {
@@ -66,6 +66,10 @@ function App() {
     code:[],
     name:[]
   })
+  //**수정한 부분 12/02 02:43
+  const [dataSumList, setDataSumList] = useState([])
+  const [detail,setDetail] = useState([])
+  const [cityList,setCityList] = useState([])
 
   
   // 인증키
@@ -153,7 +157,8 @@ function App() {
     }
   }, [routeCode]) // 도로 코드가 바뀔때 마다 새로 불러옴
   // 성빈 useEffect 2
-  useEffect(async () => {
+   //수정한 부분이 맞을걸?? 1202/0245 성우 async 지웠을것으로 생각
+  useEffect( () => {
     switch (start) {
       case '서울':
         setSrtYvalue(37.54)
@@ -307,6 +312,7 @@ function App() {
   }, [start, end])
 
   // 성빈 useEffect 3
+ 
   useEffect(() => {
     (srtYvalue - endYvalue > 0) ? setUpDownCode('S') : setUpDownCode('E')
   },[srtYvalue, endYvalue])
@@ -323,7 +329,7 @@ function App() {
       console.log('Weather ERROR')
     }
   },[start, end])
-
+  
 
 
   // 성우 useEffect
@@ -409,7 +415,36 @@ function App() {
  
     
   },[start,end])
-
+//수정한 부분 12/02/02:44
+  useEffect(async()=>{
+    let tempDataList = []
+    let tempCityList = []
+    let sumTimeAvg = 0
+    let sumTimeMax = 0
+    let sumTimeMin = 0
+    try {for (let i = 0; i < startList.code.length; i++) {
+      const data = await axios.get(`http://data.ex.co.kr/openapi/odhour/trafficTimeByRoute?key=6844121548&type=json&startUnitCode=${startList.code[i]}&endUnitCode=${endList.code[i]}`)
+      const { list } = data.data
+      for (let j = 0; j < list.length; j++) {
+          if (list[j].startUnitCode === `${startList.code[i]} ` && list[j].endUnitCode === `${endList.code[i]} ` && list[j].carType === '1') {
+              tempDataList.push({ 'carType': list[j].carType, 'startUnitCode': list[j].startUnitCode, 'endUnitCode': list[j].endUnitCode, 'timeAvg': list[j].timeAvg, 'timeMax': list[j].timeMax, 'timeMin': list[j].timeMin, 'sumTm': list[j].sumTm });
+          }
+      }   
+  }
+  for (let i = 0; i <startList.code.length;i++){
+    tempCityList.push({'sCity':startList.name[i],'eCity':endList.name[i]})
+  }
+  for (let j = 0; j < tempDataList.length; j++) {
+      sumTimeAvg = sumTimeAvg + parseInt(tempDataList[j].timeAvg)
+      sumTimeMax = sumTimeMax + parseInt(tempDataList[j].timeMax)
+      sumTimeMin = sumTimeMin + parseInt(tempDataList[j].timeMin)
+  }
+  setCityList(tempCityList)
+  setDataSumList([sumTimeAvg, sumTimeMax, sumTimeMin])
+  setDetail(tempDataList)
+  }catch (e) {
+    console.log('err')
+}},[startList,endList])
 
 
   return (<div className="App" >
@@ -427,9 +462,8 @@ function App() {
 
       {/* 예상도착시간 */}
     <div>
-      {/* <Input name = 'start' type = 'text' placeholder ='' onChange = {handleChange}></Input>
-      <Input name = 'end' type = 'text' placeholder ='' onChange = {handleChange}></Input> */}
-      <GetMultiTraffic start={start} end={end} startList={startList} endList={endList}></GetMultiTraffic>
+      {/* 수정한 부분 1202/0244 */}
+      <GetMultiTraffic dataSumList ={dataSumList} detail = {detail} cityList = {cityList} start = {start} end = {end}></GetMultiTraffic>
     </div>
       <br />
 
